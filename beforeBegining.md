@@ -4,7 +4,7 @@
 
 在Caffe中定义一个网络是通过编辑一个prototxt文件来完成的，一个简单的网络定义文件如下：
 
-```
+```C++
 name: "ExampleNet"
 layer {
   name: "data"
@@ -52,7 +52,7 @@ Caffe中定义了丰富的layer类型，每个**类型都有对应的一些参�
 
 首先我们需要了解Google Protocol Buffer定义data schema的方式，Google Protocol Buffer通过一种类似于C++的语言来定义数据结构，下面是官网上一个典型的AddressBook例子：
 
-```
+```C++
 // AddressBook.proto
 package tutorial;
 
@@ -108,7 +108,7 @@ protoc -I=/protofile/directory –cpp_out=/output/directory /path/to/protofile
 
 `I`之后为`proto`文件的路径，`--cpp_out`为编译生成的`.h`和`.cc`文件的路径，最后是`proto`文件的路径。**编译之后会生成`AddressBook.pb.h`和`AddressBook/pb.cc`文件，其中包含了大量的接口函数**，用户可以利用这些接口函数获取和改变某个`field`的值。对应上面的`data schema`定义，有这样的一些接口函数：
 
-```
+```C++
 // name
 inline bool has_name() const;
 inline void clear_name();
@@ -228,7 +228,7 @@ int main(int argc, char* argv[]) {
 
 读取和解析数据的代码：
 
-```
+```C++
 int fd = open(argv[1], O_RDONLY);
 FileInputStream* input = new FileInputStream(fd);
 if (!google::protobuf::TextFormat::Parse(input, &address_book)) {
@@ -240,7 +240,7 @@ if (!google::protobuf::TextFormat::Parse(input, &address_book)) {
 
 接口函数。上面的文件的解析结果如图所示：
 
-```
+```C++
 # ExampleAddressBook.prototxt
 person {
   name: "Alex K"
