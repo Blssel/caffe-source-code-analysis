@@ -1,3 +1,7 @@
+/*
+ *如果是光流模式 ReadSegmentFlowToDatum()函数将图片读入到结构体当中
+ *以函数ReadSegmentRGBToDatum为例，定义在io.cpp，在372行左右，在caffe-action/src/caffe/util中,加载图片到数据库的很多底层函数都在这里定义。
+*/
 #include <fcntl.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -364,21 +368,22 @@ bool ReadSegDataToDatum(const string& img_filename, const string& label_filename
 }
 
 
-
+// 参数很多，offset指段间偏移 length表示每段里面包含几张图片
 bool ReadSegmentRGBToDatum(const string& filename, const int label,
     const vector<int> offsets, const int height, const int width, const int length, Datum* datum, bool is_color,
-    const char* name_pattern ){
+    const char* name_pattern ){                  
 	cv::Mat cv_img;
 	string* datum_string;
 	char tmp[30];
 	int cv_read_flag = (is_color ? CV_LOAD_IMAGE_COLOR :
 	    CV_LOAD_IMAGE_GRAYSCALE);
-	for (int i = 0; i < offsets.size(); ++i){
+        // 循环读取一个snippet
+	for (int i = 0; i < offsets.size(); ++i){   // offsets.size()=段数
 		int offset = offsets[i];
-		for (int file_id = 1; file_id < length+1; ++file_id){
+		for (int file_id = 1; file_id < length+1; ++file_id){  // 每段里面包含几张图片！！！！！！！
 			sprintf(tmp, name_pattern, int(file_id+offset));
 			string filename_t = filename + "/" + tmp;
-			cv::Mat cv_img_origin = cv::imread(filename_t, cv_read_flag);
+			cv::Mat cv_img_origin = cv::imread(filename_t, cv_read_flag); // 读取图片
 			if (!cv_img_origin.data){
 				LOG(ERROR) << "Could not load file " << filename_t;
 				return false;
