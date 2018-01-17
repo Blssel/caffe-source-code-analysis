@@ -34,15 +34,19 @@ namespace caffe {
 template <typename Dtype>
 class BaseDataLayer : public Layer<Dtype> {
 public:
+        // 构造函数
 	explicit BaseDataLayer(const LayerParameter& param);
 	// LayerSetUp: implements common data layer setup functionality, and calls
 	// DataLayerSetUp to do special data layer setup for individual layer types.
 	// This method may not be overridden except by the BasePrefetchingDataLayer.
+        // 实现通用层配置
 	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 			const vector<Blob<Dtype>*>& top);
+        // 实现读取数据层的设置
 	virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
 			const vector<Blob<Dtype>*>& top) {}
-	// Data layers have no bottoms, so reshaping is trivial.
+
+	// Data layers have no bottoms, so reshaping is trivial.由于数据读取层没有bottom，所以reshape操作就不重要
 	virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
 			const vector<Blob<Dtype>*>& top) {}
 
@@ -62,6 +66,7 @@ public:
 	}
 #endif
 
+// 声明了几个属性 :声明了TransformationParameter对象参数，data_transformer_数据处理器，top是否具有label
 protected:
 
 #ifdef USE_MPI
@@ -80,9 +85,12 @@ protected:
 	bool output_labels_;
 };
 
+
+// BasePrefetchingDataLayer类，继承自BaseDataLayer和InternalThread
 template <typename Dtype>
 class BasePrefetchingDataLayer :
 		public BaseDataLayer<Dtype>, public InternalThread {
+// 构造
 		public:
 	explicit BasePrefetchingDataLayer(const LayerParameter& param)
 	: BaseDataLayer<Dtype>(param) {}
@@ -102,6 +110,8 @@ class BasePrefetchingDataLayer :
 	// The thread's function
 	virtual void InternalThreadEntry() {}
 
+// 定义三个属性: 三个blob块，一个prefetch_data_，一个prefetch_label_，一个transformed_data_。
+// 可以想一下，perfetch_data_ 和data_不同的地方是data_是Blob里声明的变量，用于存储一张图片，而perfetch_data_里也是Blob里声明的变量，但不同是perfetch_data_里是以Batch为单位存储的，当然不代表perfetch_data_ 就是Batch个Blob，事实是data_和prefetch_data_都是一个Blob，只不过 shape(0) 维度不同而已 
 		protected:
 	Blob<Dtype> prefetch_data_;
 	Blob<Dtype> prefetch_label_;

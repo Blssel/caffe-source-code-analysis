@@ -185,6 +185,7 @@ void VideoDataLayer<Dtype>::InternalThreadEntry(){
 	}
 }
 
+// 最后的这两行十分重要：会对层进行注册
 INSTANTIATE_CLASS(VideoDataLayer);
 REGISTER_LAYER_CLASS(VideoData);
 }
